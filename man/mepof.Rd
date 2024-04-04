@@ -7,11 +7,11 @@
 mepof(
   depth = seq(0, 10, length.out = 100),
   l = seq(40, 50, length.out = 100),
-  d = rep(762, 100),
-  wth = rep(10, 100),
-  strength = rep(358.5274, 100),
-  pressure = rep(0.588, 100),
-  temperature = rep(150, 100),
+  d = rep.int(762, 100),
+  wth = rep.int(10, 100),
+  strength = rep.int(358.5274, 100),
+  pressure = rep.int(0.588, 100),
+  temperature = rep.int(150, 100),
   rar = function(n) stats::runif(n, 0.01, 0.3)/365,
   ral = function(n) stats::runif(n, 0.01, 0.3)/365,
   days = 0,
@@ -27,9 +27,9 @@ mepof(
 \item{l}{maximum longitudinal length of corroded area measured during
 \emph{inline inspection}, [\emph{mm}]. Type: \code{\link{assert_double}}.}
 
-\item{d}{nominal outside diameter of the pipe, [\emph{mm}]. Type: \code{\link{assert_double}}.}
+\item{d}{nominal outside diameter of pipe, [\emph{mm}]. Type: \code{\link{assert_double}}.}
 
-\item{wth}{nominal wall thickness of the pipe, [\emph{mm}]. Type: \code{\link{assert_double}}.}
+\item{wth}{nominal wall thickness of pipe, [\emph{mm}]. Type: \code{\link{assert_double}}.}
 
 \item{strength}{one of the next characteristics of steel strength, [\emph{MPa}]:
 \itemize{
@@ -39,7 +39,7 @@ mepof(
         strength (\emph{SMTS}) for use with other failure pressure codes
         (\code{\link{dnvpf}}, \code{\link{pcorrcpf}}, \code{\link{shell92pf}}).
 }
-Type: \code{\link{assert_choice}}.}
+Type: \code{\link{assert_double}}.}
 
 \item{pressure}{\href{https://en.wikipedia.org/wiki/Pressure_measurement#Absolute}{absolute pressure}
 of substance (i.e. heat carrier) inside the pipe measured near defect
@@ -106,12 +106,12 @@ Calculate \emph{probability of failure} (POF) of the corroded pipe taking into
 
  That is why in the method they consider two possible failures for a single
  pipeline cross section with the on-surface and longitudinally oriented
- defect of the \emph{metal-loss} type:
+ defect of \emph{metal-loss} type:
 
  \describe{
-    \item{\emph{rupture}}{a decrease of the value of failure pressure down
+    \item{\emph{rupture}}{a decrease of value of failure pressure down
     to the operating pressure.}
-    \item{\emph{leak}}{increase of the corrosion depth (defect) up to the
+    \item{\emph{leak}}{increase of corrosion depth (defect) up to the
     specified ultimate permissible fraction of pipe wall thickness.}
  }
 
@@ -128,7 +128,7 @@ factors and for \emph{inline inspection} measurements.
 \details{
 Since for all influence factors they can more or less assume range limits,
  the \emph{uniform distribution} gets the maximum entropy in this context
- (see \href{https://www.bipm.org/utils/common/documents/jcgm/JCGM_101_2008_E.pdf}{JCGM 101:2008}).
+ (see \href{https://www.bipm.org/documents/20126/2071204/JCGM_101_2008_E.pdf/325dcaad-c15a-407c-1105-8b7f322d651c}{JCGM 101:2008}).
  That is why parameters of corrosion defects measured during the
  \emph{inline inspection} as well as regime parameters and engineering
  characteristics of pipe segment - all they are simulated by
@@ -162,6 +162,8 @@ Since for all influence factors they can more or less assume range limits,
  corrosion rate.
 }
 \examples{
+ library(pipenostics)
+
 \donttest{
 # Let's consider a pipe in district heating network with
 diameter           <- 762         # [mm]
@@ -190,7 +192,7 @@ pof <- mepof(depth, length, rep(diameter, 4), rep(wall_thickness, 4),
 print(pof)
 # 0.000000 0.252510 0.368275 0.771595
 
-# So, the POF of the pipe is near
+# So, the POF of pipe is near
 print(max(pof))
 # 0.771595
 
@@ -227,8 +229,8 @@ print(max(pof))
    of Pipeline Systems}, Topics in Safety, Risk, Reliability and Quality 30,
    \strong{DOI 10.1007/978-3-319-25307-7}.
 
- \item \href{https://www.bipm.org/en/about-us/}{BIPM}. Guides in Metrology (GUM).
-   \href{https://www.bipm.org/utils/common/documents/jcgm/JCGM_101_2008_E.pdf}{JCGM 101:2008}.
+ \item \href{https://www.bipm.org/en/home}{BIPM}. Guides in Metrology (GUM).
+   \href{https://www.bipm.org/documents/20126/2071204/JCGM_101_2008_E.pdf/325dcaad-c15a-407c-1105-8b7f322d651c}{JCGM 101:2008}.
    Evaluation of measurement data – \strong{Supplement 1} to the \emph{Guide to
    the expression of uncertainty in measurement} –
    Propagation of distributions using a \emph{Monte Carlo} method.

@@ -7,9 +7,9 @@
 dnvpf(d, wth, uts, depth, l)
 }
 \arguments{
-\item{d}{nominal outside diameter of the pipe, [\emph{mm}]. Type: \code{\link{assert_double}}.}
+\item{d}{nominal outside diameter of pipe, [\emph{mm}]. Type: \code{\link{assert_double}}.}
 
-\item{wth}{nominal wall thickness of the pipe, [\emph{mm}]. Type: \code{\link{assert_double}}.}
+\item{wth}{nominal wall thickness of pipe, [\emph{mm}]. Type: \code{\link{assert_double}}.}
 
 \item{uts}{ultimate tensile strength (\emph{UTS}) or
 specified minimum tensile strength (\emph{SMTS}) as a
@@ -26,13 +26,13 @@ Estimated failure pressure of the corroded pipe, [\emph{MPa}].
 \description{
 Calculate failure pressure of the corroded pipe
  according to \emph{Section 8.2} of
- in \href{https://rules.dnvgl.com/docs/pdf/DNV/codes/docs/2010-10/RP-F101.pdf}{DNV-RP-F101}.
+ in \href{https://www.dnv.com/oilgas/download/dnv-rp-f101-corroded-pipelines/}{DNV-RP-F101}.
  The estimation is valid for single isolated metal loss defects of
  the corrosion/erosion type and when only internal pressure loading
  is considered.
 
  The next assumption of the corrosion shape is adopted by
- \href{https://rules.dnvgl.com/docs/pdf/DNV/codes/docs/2010-10/RP-F101.pdf}{DNV-RP-F101}:
+ \href{https://www.dnv.com/oilgas/download/dnv-rp-f101-corroded-pipelines/}{DNV-RP-F101}:
 
  \figure{dnvpf.png}
 
@@ -56,6 +56,7 @@ In contrast to
   use are offended.
 }
 \examples{
+ library(pipenostics)
 
 d     <- c(812.8, 219.0)  # [mm]
 wth   <- c( 19.1,  14.5)  # [mm]
@@ -69,9 +70,9 @@ dnvpf(d, wth, uts, depth, l)
 }
 \references{
 \enumerate{
- \item Recommended practice \href{https://rules.dnvgl.com/docs/pdf/DNV/codes/docs/2010-10/RP-F101.pdf}{DNV-RP-F101}.
+ \item Recommended practice \href{https://www.dnv.com/oilgas/download/dnv-rp-f101-corroded-pipelines/}{DNV-RP-F101}.
    Corroded pipelines. \strong{DET NORSKE VERITAS}, October 2010.
- \item \href{https://www.techstreet.com/standards/asme-b31g-2012-r2017?product_id=1842873}{ASME B31G-2012}.
+ \item \href{https://store.accuristech.com:443/standards/asme-b31g-2012-r2017?product_id=1842873}{ASME B31G-2012}.
    Manual for determining the remaining strength of corroded pipelines:
    supplement to \emph{B31 Code} for pressure piping.
  \item  S. Timashev and A. Bushinskaya, \emph{Diagnostics and Reliability

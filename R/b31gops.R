@@ -8,13 +8,13 @@
 #'  technological control required? or is it critical situation?
 #'
 #' @param wth
-#'  nominal wall thickness of the pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
+#'  nominal wall thickness of pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
 #'
 #' @param depth
 #'  measured maximum depth of the corroded area, [\emph{inch}]. Type: \code{\link{assert_double}}.
 #'
 #' @return
-#'  Operational status of pipe:
+#'  Operational status of pipe as an integer value:
 #'  \itemize{
 #'    \item \emph{1} - excellent
 #'    \item \emph{2} - monitoring is recommended
@@ -30,6 +30,8 @@
 #' @export
 #'
 #' @examples
+#'  library(pipenostics)
+#'
 #'  b31gops(.438, .1)
 #'  # [1] 2  # typical status for the most of pipes
 #'
@@ -37,9 +39,16 @@
 #'  # [1] 3  # alert! Corrosion depth is too high! Replace the pipe!
 #'
 b31gops <- function(wth, depth){
-  checkmate::assert_double(wth, lower = 0, upper = 1.275e4, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(depth, lower = 0, upper = 2.54e4, finite = TRUE, any.missing = FALSE, min.len = 1)
+  checkmate::assert_double(
+    wth, lower = 0, upper = 1.275e4, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    depth, lower = 0, upper = 2.54e4, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_true(commensurable(c(length(wth), length(depth))))
 
   a <- .8*wth  # alert setting
-  1 + (depth > .1*wth & depth <= a) + 2*(depth > a)
+  as.integer(1 + (depth > .1*wth & depth <= a) + 2*(depth > a))
 }

@@ -15,7 +15,7 @@ A data frame with 15 rows and 3 variables:
  }
 }
 \source{
-\url{http://www.complexdoc.ru/ntdtext/547103/}
+\url{https://docs.cntd.ru/document/1200035568}
 }
 \usage{
 m278soildata
@@ -23,7 +23,7 @@ m278soildata
 \description{
 Data represent normative values of thermal conductivity of subsoils
 which can surround pipes according to Table 5.3 of Appendix 5.3 in
-\href{http://www.complexdoc.ru/ntdtext/547103/}{Minenergo Method 278}.
+\href{https://docs.cntd.ru/document/1200035568}{Minenergo Method 278}.
 }
 \seealso{
 Other Minenergo: 
@@ -33,9 +33,8 @@ Other Minenergo:
 \code{\link{m278insdata}},
 \code{\link{m278inshcm}()},
 \code{\link{m325beta}()},
-\code{\link{m325dropt}()},
-\code{\link{m325nhldata}},
 \code{\link{m325nhl}()},
+\code{\link{m325nhldata}},
 \code{\link{m325testbench}}
 }
 \concept{Minenergo}

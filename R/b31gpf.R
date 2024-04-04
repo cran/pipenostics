@@ -39,10 +39,10 @@
 #'   use are offended.
 #'
 #' @param d
-#'  nominal outside diameter of the pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
+#'  nominal outside diameter of pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
 #'
 #' @param wth
-#'  nominal wall thickness of the pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
+#'  nominal wall thickness of pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
 #'
 #' @param smys
 #'  specified minimum yield of stress (\emph{SMYS}) as a
@@ -60,7 +60,7 @@
 #'
 #' @references
 #'  \enumerate{
-#'  \item \href{https://www.techstreet.com/standards/asme-b31g-2012-r2017?product_id=1842873}{ASME B31G-2012}.
+#'  \item \href{https://store.accuristech.com:443/standards/asme-b31g-2012-r2017?product_id=1842873}{ASME B31G-2012}.
 #'    Manual for determining the remaining strength of corroded pipelines:
 #'    supplement to \emph{B31 Code} for pressure piping.
 #'  \item  S. Timashev and A. Bushinskaya, \emph{Diagnostics and Reliability
@@ -75,6 +75,8 @@
 #' @export
 #'
 #' @examples
+#'  library(pipenostics)
+#'
 #'  ## Example: maximum percentage disparity of original B31G
 #'  ## algorithm and modified B31G showed on CRVL.BAS data
 #'  with(b31gdata, {
@@ -107,22 +109,40 @@
 #'
 #'
 b31gpf <- function(d, wth, smys, depth, l) {
-  checkmate::assert_double(d, lower = .03937008, upper = 196.8504, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(wth, lower = 0, upper = 19.68504, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(smys, lower = 725.1887, upper = 290075.4760, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(depth, lower = 0, upper = 39.37008, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(l, lower = 0, upper = 196.8504, finite = TRUE, any.missing = FALSE, min.len = 1)
+  checkmate::assert_double(
+    d, lower = .03937008, upper = 196.8504, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    wth, lower = 0, upper = 19.68504, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    smys, lower = 725.1887, upper = 290075.4760, finite = TRUE,
+    any.missing = FALSE, min.len = 1L
+  )
+  checkmate::assert_double(
+    depth, lower = 0, upper = 39.37008, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    l, lower = 0, upper = 196.8504, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_true(commensurable(c(
+    length(d), length(wth), length(smys), length(depth), length(l)
+  )))
 
   z  <- l^2/d/wth
   s_flow <- 1.1*smys
 
   # Operate with M^2 to avoid sqrt warning when negative argument
-  M2  <- 1 + .8*z
-  M2[M2 < .Machine$double.eps] <- NA_real_
+  M2  <- 1.0 + .8*z
+  M2[ M2 < .Machine[["double.eps"]] ] <- NA_real_
 
   dw <- depth/wth
-  sf <- s_flow*ifelse(z > 20, 1 - dw, (1 - 2/3*dw)/(1 - 2/3*dw/sqrt(M2)))
-  Pf <- 2*sf*wth/d
+  sf <- s_flow*ifelse(z > 20, 1.0 - dw, (1.0 - 2/3*dw)/(1.0 - 2/3*dw/sqrt(M2)))
+  Pf <- 2.0*sf*wth/d
   Pf[smys > 55984.57 | depth < .1*wth | depth > .8*wth] <- NA_real_
   Pf  # Failure pressure, Pf, [PSI]
 }

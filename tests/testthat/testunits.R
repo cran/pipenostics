@@ -50,3 +50,75 @@ test_that("*psi_mpa* errs in calculation", {
     tolerance = 1e-5
   )
 })
+
+
+test_that("*k_c* errs in calculation", {
+  expect_equal(
+   k_c(c(-273.15, 100)),
+   c(0, 373.15),
+   tolerance = 1e-8
+  )
+})
+
+
+test_that("*k_f* errs in calculation", {
+  expect_equal(
+    k_f(c(-459.67, 212)),
+    c(0, 373.15),
+    tolerance = 1e-8
+  )
+})
+
+
+test_that("*c_k* errs in calculation", {
+  expect_equal(
+    c_k(c(0, 373.15)),
+    c(-273.15, 100),
+    tolerance = 1e-8
+  )
+})
+
+
+test_that("*c_f* errs in calculation", {
+  expect_equal(
+    c_f(c(-459.67, 212)),
+    c(-273.15, 100),
+    tolerance = 1e-8
+  )
+})
+
+
+test_that("*f_k* errs in calculation", {
+  expect_equal(
+    f_k(c(0, 373.15)),
+    c(-459.67, 212),
+    tolerance = 1e-8
+  )
+})
+
+
+test_that("*f_c* errs in calculation", {
+  expect_equal(
+    f_c(c(-273.15, 100)),
+    c(-459.67, 212),
+    tolerance = 1e-8
+  )
+})
+
+
+test_that("*flux_loss* errs in calculation", {
+  expect_equal(
+    flux_loss(c(218, 1040), c(998, 1395) * 1e-3, c(2, 5)),
+    c(80.70238, 275.00155),
+    tolerance = 5e-6
+  )
+})
+
+
+test_that("*loss_flux* errs in calculation", {
+  expect_equal(
+    loss_flux(c(80.70238, 275.00155), c(998, 1395) * 1e-3, c(2, 5)),
+    c(218, 1040),
+    tolerance = 5e-6
+  )
+})

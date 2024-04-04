@@ -6,13 +6,13 @@
 #' @description
 #'  Calculate failure pressure of the corroded pipe
 #'  according to \emph{Section 8.2} of
-#'  in \href{https://rules.dnvgl.com/docs/pdf/DNV/codes/docs/2010-10/RP-F101.pdf}{DNV-RP-F101}.
+#'  in \href{https://www.dnv.com/oilgas/download/dnv-rp-f101-corroded-pipelines/}{DNV-RP-F101}.
 #'  The estimation is valid for single isolated metal loss defects of
 #'  the corrosion/erosion type and when only internal pressure loading
 #'  is considered.
 #'
 #'  The next assumption of the corrosion shape is adopted by
-#'  \href{https://rules.dnvgl.com/docs/pdf/DNV/codes/docs/2010-10/RP-F101.pdf}{DNV-RP-F101}:
+#'  \href{https://www.dnv.com/oilgas/download/dnv-rp-f101-corroded-pipelines/}{DNV-RP-F101}:
 #'
 #'  \figure{dnvpf.png}
 #'
@@ -36,10 +36,10 @@
 #'   use are offended.
 #'
 #' @param d
-#'  nominal outside diameter of the pipe, [\emph{mm}]. Type: \code{\link{assert_double}}.
+#'  nominal outside diameter of pipe, [\emph{mm}]. Type: \code{\link{assert_double}}.
 #'
 #' @param wth
-#'  nominal wall thickness of the pipe, [\emph{mm}]. Type: \code{\link{assert_double}}.
+#'  nominal wall thickness of pipe, [\emph{mm}]. Type: \code{\link{assert_double}}.
 #'
 #' @param uts
 #'  ultimate tensile strength (\emph{UTS}) or
@@ -58,9 +58,9 @@
 #'
 #' @references
 #'  \enumerate{
-#'  \item Recommended practice \href{https://rules.dnvgl.com/docs/pdf/DNV/codes/docs/2010-10/RP-F101.pdf}{DNV-RP-F101}.
+#'  \item Recommended practice \href{https://www.dnv.com/oilgas/download/dnv-rp-f101-corroded-pipelines/}{DNV-RP-F101}.
 #'    Corroded pipelines. \strong{DET NORSKE VERITAS}, October 2010.
-#'  \item \href{https://www.techstreet.com/standards/asme-b31g-2012-r2017?product_id=1842873}{ASME B31G-2012}.
+#'  \item \href{https://store.accuristech.com:443/standards/asme-b31g-2012-r2017?product_id=1842873}{ASME B31G-2012}.
 #'    Manual for determining the remaining strength of corroded pipelines:
 #'    supplement to \emph{B31 Code} for pressure piping.
 #'  \item  S. Timashev and A. Bushinskaya, \emph{Diagnostics and Reliability
@@ -75,6 +75,7 @@
 #' @export
 #'
 #' @examples
+#'  library(pipenostics)
 #'
 #' d     <- c(812.8, 219.0)  # [mm]
 #' wth   <- c( 19.1,  14.5)  # [mm]
@@ -86,14 +87,28 @@
 #' # [1] 15.86626 34.01183
 #'
 dnvpf <- function(d, wth, uts, depth, l){
-  checkmate::assert_double(d, lower = 1, upper = 5e3, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(wth, lower = 0, upper = 5e2, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(uts, lower = 5, upper = 2e3, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(depth, lower = 0, upper = 1e3, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(l, lower = 0, upper = 5e3, finite = TRUE, any.missing = FALSE, min.len = 1)
+  checkmate::assert_double(
+    d, lower = 1, upper = 5e3, finite = TRUE, any.missing = FALSE, min.len = 1L
+  )
+  checkmate::assert_double(
+    wth, lower = 0, upper = 5e2, finite = TRUE, any.missing = FALSE, min.len = 1L
+  )
+  checkmate::assert_double(
+    uts, lower = 5, upper = 2e3, finite = TRUE, any.missing = FALSE, min.len = 1L
+  )
+  checkmate::assert_double(
+    depth, lower = 0, upper = 1e3, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    l, lower = 0, upper = 5e3, finite = TRUE, any.missing = FALSE, min.len = 1L
+  )
+  checkmate::assert_true(commensurable(c(
+    length(d), length(wth), length(uts), length(depth), length(l)
+  )))
 
-  Q <- sqrt(1 + .31*l^2/d/wth)
-  Pf <- 2*wth*uts*(1 - depth/wth)/(d - wth)/(1 - depth/wth/Q)
+  Q <- sqrt(1.0 + .31*l^2/d/wth)
+  Pf <- 2.0*wth*uts*(1 - depth/wth)/(d - wth)/(1.0 - depth/wth/Q)
   Pf[depth >= .85*wth] <- NA_real_
   Pf
 }

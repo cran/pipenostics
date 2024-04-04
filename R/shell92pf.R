@@ -10,7 +10,7 @@
 #'  This code should be applied only to
 #'  \itemize{
 #'    \item single cross section of the pipeline containing a longitudinally
-#'          oriented, flat bottom surface defect of the corrosion/erosion type;
+#'          oriented, flat bottom surface defect of corrosion/erosion type;
 #'    \item defects which depth is less than 85 \% of pipe wall thickness.
 #'  }
 #'
@@ -26,11 +26,11 @@
 #'   use are offended.
 #'
 #' @param d
-#'  nominal outside diameter of the pipe, [\emph{mm}].
+#'  nominal outside diameter of pipe, [\emph{mm}].
 #'  Type: \code{\link{assert_double}}.
 #'
 #' @param wth
-#'  nominal wall thickness of the pipe, [\emph{mm}].
+#'  nominal wall thickness of pipe, [\emph{mm}].
 #'  Type: \code{\link{assert_double}}.
 #'
 #' @param uts
@@ -63,6 +63,7 @@
 #' @export
 #'
 #' @examples
+#'  library(pipenostics)
 #'
 #' d     = c(812.8, 219.0)  # [mm]
 #' wth   = c( 19.1,  14.5)  # [mm]
@@ -74,11 +75,14 @@
 #' # [1] 11.09262 25.27286
 #'
 shell92pf <- function(d, wth, uts, depth, l){
-  checkmate::assert_double(d, lower = 1, upper = 5e3, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(wth, lower = 0, upper = 5e2, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(uts, lower = 5, upper = 2e3, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(depth, lower = 0, upper = 1e3, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(l, lower = 0, upper = 5e3, finite = TRUE, any.missing = FALSE, min.len = 1)
+  checkmate::assert_double(d, lower = 1, upper = 5e3, finite = TRUE, any.missing = FALSE, min.len = 1L)
+  checkmate::assert_double(wth, lower = 0, upper = 5e2, finite = TRUE, any.missing = FALSE, min.len = 1L)
+  checkmate::assert_double(uts, lower = 5, upper = 2e3, finite = TRUE, any.missing = FALSE, min.len = 1L)
+  checkmate::assert_double(depth, lower = 0, upper = 1e3, finite = TRUE, any.missing = FALSE, min.len = 1L)
+  checkmate::assert_double(l, lower = 0, upper = 5e3, finite = TRUE, any.missing = FALSE, min.len = 1L)
+  checkmate::assert_true(commensurable(c(
+    length(d), length(wth), length(uts), length(depth), length(l)
+  )))
 
   Q <- sqrt(1 + .805*l^2/d/wth)
   Pf <- 2*wth*.9*uts*(1 - depth/wth)/d/(1 - depth/wth/Q)

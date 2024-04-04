@@ -7,13 +7,13 @@
 #'  Calculate safe maximum pressure for the corroded area of pipe.
 #'
 #' @param dep
-#'  design pressure of the pipe, [\emph{PSI}]. Type: \code{\link{assert_double}}.
+#'  design pressure of pipe, [\emph{PSI}]. Type: \code{\link{assert_double}}.
 #'
 #' @param d
-#'  nominal outside diameter of the pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
+#'  nominal outside diameter of pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
 #'
 #' @param wth
-#'  nominal wall thickness of the pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
+#'  nominal wall thickness of pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
 #'
 #' @param depth
 #'   measured maximum depth of the corroded area, [\emph{inch}]. Type: \code{\link{assert_double}}.
@@ -32,6 +32,8 @@
 #' @export
 #'
 #' @examples
+#'  library(pipenostics)
+#'
 #'  b31gsap(1093, 30, .438, .1, 7.5)
 #'  # [1] 1093  # [PSI], safe pressure is equal to design pressure
 #'
@@ -39,18 +41,36 @@
 #'  # [1] 690   # [PSI], safe pressure is lower than design pressure due corrosion
 #'
 b31gsap <- function(dep, d, wth, depth, l){
-  checkmate::assert_double(dep, lower = 0, upper = 6e3, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(d, lower = 3.93e-2, upper = 1.27e5, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(wth, lower = 0, upper = 1.275e4, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(depth, lower = 0, upper = 2.54e4, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(l, lower = 0, upper = 1.275e4, finite = TRUE, any.missing = FALSE, min.len = 1)
+  checkmate::assert_double(
+    dep, lower = 0, upper = 6e3, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    d, lower = 3.93e-2, upper = 1.27e5, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    wth, lower = 0, upper = 1.275e4, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    depth, lower = 0, upper = 2.54e4, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    l, lower = 0, upper = 1.275e4, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_true(commensurable(c(
+    length(dep), length(d), length(wth), length(depth), length(l)
+  )))
 
   A <- b31gafr(d, wth, l)
   d2w <- depth/wth
   sap <- trunc(
     ifelse(A > 4,
-           1.1*dep*(1 - d2w) + .5,
-           1.1*dep*(1 - 2/3*d2w)/(1 - 2/3*d2w/sqrt(A^2 + 1)) + .5)
+           1.1*dep*(1.0 - d2w) + .5,
+           1.1*dep*(1.0 - 2/3*d2w)/(1.0 - 2/3*d2w/sqrt(A^2 + 1.0)) + .5)
   )
   ifelse(sap > dep, dep, sap)
 }

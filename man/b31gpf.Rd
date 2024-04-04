@@ -7,9 +7,9 @@
 b31gpf(d, wth, smys, depth, l)
 }
 \arguments{
-\item{d}{nominal outside diameter of the pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.}
+\item{d}{nominal outside diameter of pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.}
 
-\item{wth}{nominal wall thickness of the pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.}
+\item{wth}{nominal wall thickness of pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.}
 
 \item{smys}{specified minimum yield of stress (\emph{SMYS}) as a
 characteristics of steel strength, [\emph{PSI}]. Type: \code{\link{assert_double}}.}
@@ -58,6 +58,8 @@ Since the definition of flow stress, \emph{Sflow}, in
   use are offended.
 }
 \examples{
+ library(pipenostics)
+
  ## Example: maximum percentage disparity of original B31G
  ## algorithm and modified B31G showed on CRVL.BAS data
  with(b31gdata, {
@@ -92,7 +94,7 @@ Since the definition of flow stress, \emph{Sflow}, in
 }
 \references{
 \enumerate{
- \item \href{https://www.techstreet.com/standards/asme-b31g-2012-r2017?product_id=1842873}{ASME B31G-2012}.
+ \item \href{https://store.accuristech.com:443/standards/asme-b31g-2012-r2017?product_id=1842873}{ASME B31G-2012}.
    Manual for determining the remaining strength of corroded pipelines:
    supplement to \emph{B31 Code} for pressure piping.
  \item  S. Timashev and A. Bushinskaya, \emph{Diagnostics and Reliability

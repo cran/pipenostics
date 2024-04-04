@@ -16,9 +16,6 @@
 #' directed graph of this network. For more details of isomorphic topology
 #' description see \code{\link{m325testbench}}.
 #'
-#' For possibly better performance, they search paths of heat carrier flow
-#' in parallel leveraging the functionality of package \code{\link{parallel}}.
-#'
 #' @param sender
 #'    identifier of the node which heat carrier flows out.
 #'    Type: any type that can be painlessly coerced to character by
@@ -30,9 +27,9 @@
 #'    Type: any type that can be painlessly coerced to character by
 #'    \code{\link{as.character}}.
 #'
-#' @param maxcores
-#'    maximum cores of CPU to use in parallel processing.
-#'    Type: \code{\link{assert_count}}.
+#' @param use_cluster
+#'    utilize functionality of parallel processing on multi-core CPU.
+#'    Type: \code{\link{assert_flag}}.
 #'
 #' @return
 #'  named \code{list} that contains integer vectors as its elements. The name
@@ -50,6 +47,8 @@
 #' @export
 #'
 #' @examples
+#'  library(pipenostics)
+#'
 #'\donttest{
 #' # Find path from A to B in trivial line topology:
 #' flowls("A", "B")
@@ -92,7 +91,7 @@
 #' # [1] 12 13 11  8  6  7
 #'
 #'}
-flowls <- function(sender = "A", acceptor = "B", maxcores = 2){
+flowls <- function(sender = "A", acceptor = "B", use_cluster = FALSE){
   # Validate function input ----
   checkmate::assert_true(all(!is.na(acceptor)))
   acceptor <- as.character(acceptor)
@@ -100,17 +99,17 @@ flowls <- function(sender = "A", acceptor = "B", maxcores = 2){
   n <- length(acceptor)
   sender <- as.character(sender)
   checkmate::assert_character(sender, any.missing = FALSE, len = n)
-  checkmate::assert_count(maxcores, positive = TRUE)
+  checkmate::assert_flag(use_cluster)
 
   # Validate topology ----
   starting_node_idx <- which(!(sender %in% acceptor))
   checkmate::assert_count(starting_node_idx, positive = TRUE)
   terminal_node_idx <- which(!(acceptor %in% sender))
-  checkmate::assert_integer(terminal_node_idx, min.len = 1)
+  checkmate::assert_integer(terminal_node_idx, min.len = 1L)
 
   # Search algorithm (worker) ----
   worker <- function(path_id){
-    path <- vector("integer", n)  # get *n* from parent env
+    path <- integer(n)  # get *n* from parent env
     segment_counter <- 1L
     idx <- terminal_node_idx[[path_id]]  # get *terminal_node_idx* from parent env
     path[[segment_counter]] <- idx
@@ -120,24 +119,30 @@ flowls <- function(sender = "A", acceptor = "B", maxcores = 2){
       idx <- which(acceptor == sender[acceptor == acceptor[[idx]]])
       path[[segment_counter]] <- idx
     }
-    rev(path[path > 0])
+    rev(path[path > 0L])
   }
 
-  # Run workers in parallel ----
-  cluster <- parallel::makeCluster(
-    max(1, min(parallel::detectCores() - 1), maxcores)
-  )
-  parallel::clusterExport(
-    cluster,
-    c("n", "terminal_node_idx", "starting_node_idx", "acceptor", "sender"),
-    envir = environment()
-  )
-  stream <- parallel::parLapply(
-    cluster,
-    structure(
-      seq_along(terminal_node_idx), names = acceptor[terminal_node_idx]
-    ),
-    worker)
-  parallel::stopCluster(cluster)
-  stream
+  if (use_cluster){
+    cluster <- parallel::makeCluster(parallel::detectCores() - 1)
+    parallel::clusterExport(
+      cluster,
+      c("n", "terminal_node_idx", "starting_node_idx", "acceptor", "sender"),
+      envir = environment()
+    )
+    stream <- parallel::parLapply(
+      cluster,
+      structure(
+        seq_along(terminal_node_idx), names = acceptor[terminal_node_idx]
+      ),
+      worker)
+    parallel::stopCluster(cluster)
+    return(stream)
+  } else {
+    lapply(
+      structure(
+        seq_along(terminal_node_idx), names = acceptor[terminal_node_idx]
+      ),
+      worker
+    )
+  }  
 }

@@ -1,7 +1,7 @@
 #' @title
 #'  Megapascals to kilogram-force per square
 #'
-#' @family utils
+#' @family units
 #'
 #' @description
 #'  Convert pressure (stress) measured in \href{https://en.wikipedia.org/wiki/Pascal_(unit)}{megapascals} (MPa)
@@ -22,11 +22,13 @@
 #' @export
 #'
 #' @examples
+#'  library(pipenostics)
+#'
 #'  kgf_mpa(c(0.0980665, 1))
 #'  # [1]  1.00000 10.19716
 #'
 #'
 kgf_mpa <- function(x) {
-  checkmate::assert_double(x, finite = TRUE, any.missing = FALSE, min.len = 1)
+  checkmate::assert_double(x, finite = TRUE, any.missing = FALSE, min.len = 1L)
   10.197162*x
 }

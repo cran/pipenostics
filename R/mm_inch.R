@@ -1,7 +1,7 @@
 #' @title
 #'  Inches to mm
 #'
-#' @family utils
+#' @family units
 #'
 #' @description
 #'  Convert length measured in \href{https://en.wikipedia.org/wiki/Inch}{inches}
@@ -21,10 +21,12 @@
 #' @export
 #'
 #' @examples
+#'  library(pipenostics)
+#'
 #'  mm_inch(c(0.03937008, 1))
 #'  # [1]  1.0 25.4  # [mm]
 #'
 mm_inch <- function(x) {
-  checkmate::assert_double(x, finite = TRUE, any.missing = FALSE, min.len = 1)
+  checkmate::assert_double(x, finite = TRUE, any.missing = FALSE, min.len = 1L)
   25.4*x
 }

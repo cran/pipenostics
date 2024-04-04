@@ -13,10 +13,10 @@
 #'  maximum allowable operating pressure - \emph{MAOP}, [\emph{PSI}]. Type: \code{\link{assert_double}}.
 #'
 #' @param d
-#'  nominal outside diameter of the pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
+#'  nominal outside diameter of pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
 #'
 #' @param wth
-#'  nominal wall thickness of the pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
+#'  nominal wall thickness of pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.
 #'
 #' @param smys
 #'  specified minimum yield of stress (\emph{SMYS}) as a
@@ -41,8 +41,8 @@
 #'
 #'  \describe{
 #'   \item{maop}{maximum allowable operating pressure - \emph{MAOP}, [\emph{PSI}]. Type: \code{\link{assert_double}}.}
-#'   \item{d}{nominal outside diameter of the pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.}
-#'   \item{wth}{nominal wall thickness of the pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.}
+#'   \item{d}{nominal outside diameter of pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.}
+#'   \item{wth}{nominal wall thickness of pipe, [\emph{inch}]. Type: \code{\link{assert_double}}.}
 #'   \item{smys}{specified minimum yield of stress (\emph{SMYS}) as a
 #'               characteristics of steel strength, [\emph{PSI}]. Type: \code{\link{assert_double}}.}
 #'   \item{def}{appropriate (combined) design factor from
@@ -57,7 +57,7 @@
 #'                 \emph{2} - monitoring is recommended,
 #'                 \emph{3} - alert! replace the pipe immediately!
 #'        Type: \code{\link{assert_numeric}}.}
-#'   \item{design_pressure}{design pressure of the pipe, [\emph{PSI}]. Type: \code{\link{assert_double}}.}
+#'   \item{design_pressure}{design pressure of pipe, [\emph{PSI}]. Type: \code{\link{assert_double}}.}
 #'   \item{safe_pressure}{safe maximum pressure for the corroded area, [\emph{PSI}]. Type: \code{\link{assert_double}}.}
 #'   \item{pressure_exceeding}{whether operator's action is required to reduce
 #'                             \emph{MOAP} lower than the maximum safe pressure
@@ -84,6 +84,7 @@
 #' @export
 #'
 #' @examples
+#' library(pipenostics)
 #'
 #' ## Further examples are inspired by those used in Appendix A of
 #' ## ASME B31G-1991 to verify correct entry of CRVL.BAS source code
@@ -226,34 +227,66 @@
 #' data(b31gdata)
 #' examples <- with(b31gdata, b31crvl(maop, d, wth, smys, def, depth, l))
 #'
-b31crvl <- function(maop, d, wth, smys, def = .72, depth, l){
-  checkmate::assert_double(maop, lower = 25.4, upper = 1.27e5, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(d, lower = 3.93e-2, upper = 1.27e5, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(wth, lower = 0, upper = 1.275e4, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(smys, lower = 1e3, upper = 3e5, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(def, lower = 0, upper = 1, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(depth, lower = 0, upper = 2.54e4, finite = TRUE, any.missing = FALSE, min.len = 1)
-  checkmate::assert_double(l, lower = 0, upper = 1.275e4, finite = TRUE, any.missing = FALSE, min.len = 1)
-  pipe <- data.frame(
-    maop = maop,  d = d, wth = wth, smys  = smys, def = def, depth = depth, l = l
+b31crvl <- function(maop, d, wth, smys, def = .72, depth, l) {
+  checkmate::assert_double(
+    maop, lower = 25.4, upper = 1.27e5, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
   )
-  pipe$design_pressure <- trunc(b31gdep(pipe$d, pipe$wth, pipe$smys, pipe$def))
-  pipe$status <- b31gops(pipe$wth, pipe$depth)
-  pipe$A <- b31gafr(pipe$d, pipe$wth, pipe$l)
+  checkmate::assert_double(
+    d, lower = 3.93e-2, upper = 1.27e5, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    wth, lower = 0, upper = 1.275e4, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    smys, lower = 1e3, upper = 3e5, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    def, lower = 0, upper = 1, finite = TRUE, any.missing = FALSE, min.len = 1L
+  )
+  checkmate::assert_double(
+    depth, lower = 0, upper = 2.54e4, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_double(
+    l, lower = 0, upper = 1.275e4, finite = TRUE, any.missing = FALSE,
+    min.len = 1L
+  )
+  checkmate::assert_true(commensurable(c(
+    length(maop), length(d), length(wth), length(smys), length(def),
+    length(depth), length(l)
+  )))
 
-  pipe$allowed_corrosion_depth <-
-        b31gacd(pipe$design_pressure, pipe$maop, pipe$d, pipe$wth, pipe$l)
-  pipe$safe_pressure <-
-    b31gsap(pipe$design_pressure, pipe$d, pipe$wth, pipe$depth, pipe$l)
-  pipe$pressure_exceeding <- pipe$maop > pipe$safe_pressure
-  pipe$allowed_corrosion_length <- b31gacl(
-    pipe$design_pressure, pipe$maop, pipe$d, pipe$wth, pipe$depth, pipe$l
+  pipe <- data.frame(
+     maop  = maop
+    ,d     = d
+    ,wth   = wth
+    ,smys  = smys
+    ,def   = def
+    ,depth = depth
+    ,l      = l
+
+    ,design_pressure = trunc(b31gdep(d, wth, smys, def))
+    ,status          = b31gops(wth, depth)
+    ,A               = b31gafr(d, wth, l)
   )
-  pipe$AP <- ifelse(
-        is.infinite(pipe$allowed_corrosion_length),
+
+  pipe[["safe_pressure"]] <- b31gsap(pipe[["design_pressure"]], d, wth, depth, l)
+  pipe[["allowed_corrosion_length"]] <- b31gacl(
+     pipe[["design_pressure"]], maop, d, wth, depth, l
+  )
+  pipe[["allowed_corrosion_depth"]] <- b31gacd(
+     pipe[["design_pressure"]], maop, d, wth, l
+  )
+  pipe[["pressure_exceeding"]] <- maop > pipe[["safe_pressure"]]
+  pipe[["AP"]] <- ifelse(
+        is.infinite(pipe[["allowed_corrosion_length"]]),
         5,
-        round(pipe$allowed_corrosion_length / sqrt(pipe$d * pipe$wth) / 1.12, 3)
-      )
+        round(pipe[["allowed_corrosion_length"]] / sqrt(d * wth) / 1.12, 3)
+  )
   class(pipe) <- c("crvl", class(pipe))
   return(pipe)
 }
@@ -267,35 +300,35 @@ print.crvl <- function(x, ...){
               "No resrictions on operation"),
         "",
         "Alert! Corrosion depth exceeds 80 % of pipe wall! Pipe must be replaced!"
-      )[x$status],
+      )[ x[["status"]] ],
       "-- Calculated data --",
-      sprintf("Intermediate factor (A) = %02.3f", x$A),
+      sprintf("Intermediate factor (A) = %02.3f", x[["A"]]),
       sprintf("Design pressure = %02i PSI; Safe pressure = %02i PSI",
-              x$design_pressure, x$safe_pressure),
+              x[["design_pressure"]], x[["safe_pressure"]]),
       c(
         "Repair or replace pipe because corrosion depth exceeds 80 % of pipe wall!",
-        sprintf("Pipe may be operated safely at MAOP, %02i PSI", x$maop),
+        sprintf("Pipe may be operated safely at MAOP, %02i PSI", x[["maop"]]),
         "MAOP exceeds design pressure P. Verify that this variance is valid",
         sprintf(
           paste("Reduce operating pressure so it will not exceed %02i PSI,",
                 "and so operate legally and safely", collapse = ""),
-          x$safe_pressure)
+          x[["safe_pressure"]])
       )[
-        c(x$depth > .8*x$wth,
-          x$safe_pressure >= x$maop,
-          x$maop > x$design_pressure,
-          x$pressure_exceeding)
+        c(x[["depth"]] > .8*x[["wth"]],
+          x[["safe_pressure"]] >= x[["maop"]],
+          x[["maop"]] > x[["design_pressure"]],
+          x[["pressure_exceeding"]])
         ],
       sprintf(
         paste("With corrosion length %02.3f inch, maximum allowed corrosion",
               "depth is %02.4f inch; A = %2.3f"),
-        x$l, x$allowed_corrosion_depth, x$A),
+        x[["l"]], x[["allowed_corrosion_depth"]], x[["A"]]),
       sprintf(
         paste("With corrosion depth %02.3f inch, maximum allowed corrosion",
               "length is %02.4f inch; A = %02.3f"),
-        x$depth, x$allowed_corrosion_length, x$AP),
-      if (x$depth > .8*x$wth)
+        x[["depth"]], x[["allowed_corrosion_length"]], x[["AP"]]),
+      if (x[["depth"]] > .8*x[["wth"]])
         sprintf("But %02.3f inch exceeds allowable corrosion depth!!!",
-                x$depth)
+                x[["depth"]])
     ), sep = "\n")} else NextMethod('print')
 }
